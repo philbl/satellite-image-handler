@@ -7,5 +7,4 @@ setup(
     url="https://github.com/philbl/satellite-image-handler",
     author="Philippe Blouin-Leclerc",
     author_email="phil.19013@gmail.com",
-    packages=["satellite-image-handler"],
 )

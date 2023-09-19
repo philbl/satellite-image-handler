@@ -77,7 +77,7 @@ class MorellSentinelImageHandler(AbstractSentinelImageHandler):
         return "morell"
 
     def _image_transformation_list(self):
-        transform_list = []
+        transform_list = [RotateImage(-90, self.image_shape)]
         return transform_list
 
     def _image_wkt_polygone_subset(self):

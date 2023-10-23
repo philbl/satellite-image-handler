@@ -64,6 +64,28 @@ class RescaleImage:
         new_col_index = int(col_index * self.rescale_factor)
         return new_row_index, new_col_index
 
+    def apply_inverse_transformation_to_geocoordinate(
+        self, transformed_row_index, transformed_col_index
+    ):
+        """
+        Transforms the given row and column indices based on the rescale factor.
+
+        Parameters:
+            row_index (int): The original row index.
+            col_index (int): The original column index.
+
+        Returns:
+            tuple: A tuple containing the transformed row and column indices as integers.
+
+        Notes:
+            This method multiplies the original row and column indices by the rescale factor
+            and rounds them to the nearest integer values. The transformed indices are then
+            returned as a tuple.
+        """
+        original_row_index = int(transformed_row_index / self.rescale_factor)
+        original_col_index = int(transformed_col_index / self.rescale_factor)
+        return original_row_index, original_col_index
+
 
 class RotateImage:
     """
@@ -134,6 +156,34 @@ class RotateImage:
         )
         translated_col = col_index - self.center_col
         translated_row = row_index - self.center_row
+        transformed_point = numpy.dot(
+            transform_matrix, [translated_row, translated_col]
+        )
+        transformed_col = transformed_point[1] + self.center_col
+        transformed_row = transformed_point[0] + self.center_row
+        return transformed_row, transformed_col
+
+    def apply_inverse_transformation_to_geocoordinate(
+        self, transformed_row_index, transformed_col_index
+    ):
+        """
+        Apply inverse rotation transformation to the given row and column indices.
+
+        Parameters:
+            row_index (int): The original row index.
+            col_index (int): The original column index.
+
+        Returns:
+            tuple: The transformed row and column indices.
+        """
+        angle_rad = numpy.deg2rad(-self.rotate_angle)
+        cos_theta = numpy.cos(angle_rad)
+        sin_theta = numpy.sin(angle_rad)
+        transform_matrix = numpy.array(
+            [[cos_theta, -sin_theta], [sin_theta, cos_theta]]
+        )
+        translated_col = transformed_col_index - self.center_col
+        translated_row = transformed_row_index - self.center_row
         transformed_point = numpy.dot(
             transform_matrix, [translated_row, translated_col]
         )
@@ -237,6 +287,25 @@ class PolygoneBoundariesImage:
         new_col_index = col_index - self._min_col
         return new_row_index, new_col_index
 
+    def apply_inverse_transformation_to_geocoordinate(
+        self, transformed_row_index, transformed_col_index
+    ):
+        """
+        Apply the inverse transformation to the given row and column indices.
+
+        Inverse Transforms the given row and column indices to match the subset image boundaries.
+
+        Parameters:
+            row_index (int): The transformed row index.
+            col_index (int): The transformed column index.
+
+        Returns:
+            tuple: The original row and column indices.
+        """
+        original_row_index = transformed_row_index + self._min_row
+        original_col_index = transformed_col_index + self._min_col
+        return original_row_index, original_col_index
+
 
 class IdentityPolygoneBoundariesImage:
     """
@@ -276,3 +345,20 @@ class IdentityPolygoneBoundariesImage:
             tuple: The input row and column indices unchanged.
         """
         return row_index, col_index
+
+    def apply_inverse_transformation_to_geocoordinate(
+        self, transformed_row_index, transformed_col_index
+    ):
+        """
+        Apply the inverse transformation to the given row and column indices.
+
+        Inverse Transforms the given row and column indices to match the subset image boundaries.
+
+        Parameters:
+            row_index (int): The transformed row index.
+            col_index (int): The transformed column index.
+
+        Returns:
+            tuple: The original row and column indices.
+        """
+        return transformed_row_index, transformed_col_index

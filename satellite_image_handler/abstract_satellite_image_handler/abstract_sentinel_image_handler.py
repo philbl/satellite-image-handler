@@ -8,7 +8,10 @@ import xml.etree.ElementTree as ET
 from scipy import ndimage
 from skimage.transform import rescale
 
-from satellite_image_handler.utils.projections import project_epsg4326_to_epsg_32620
+from satellite_image_handler.utils.projections import (
+    project_epsg4326_to_epsg_32620,
+    project_epsg_32620_to_epsg4326,
+)
 
 
 class AbstractSentinelImageHandler(ABC):
@@ -299,6 +302,34 @@ class AbstractSentinelImageHandler(ABC):
         # Return the transformed indices
         return row_index, col_index
 
+    def inverse_index_function(self, row_index, col_index):
+        """
+        Transforms the given row and column indices to longitude and latitude coordinates
+        based on the affine transformation matrix.
+
+        Parameters:
+            row_index (int): The row indice.
+            col_index (int): The column indice.
+
+        Returns:
+            tuple: A tuple containing the longitude and latitude coordinates.
+
+        Notes:
+            This function applies an affine transformation to convert the given
+            row and column indice into longitude and latitude coordinates. The transformation
+            is based on the affine transformation matrix stored in the instance variable
+            `affine_matrix`.
+
+        Example:
+            >>> handler = AbstractImageHandler(zip_path)
+            >>> row, col = handler.index_function(-64.12345, 46.98765)
+            >>> print(row, col)
+            4321, 1234
+        """
+        longitude, latitude = (col_index, row_index) * self.affine_matrix
+
+        return longitude, latitude
+
     def _apply_image_transformation_list(self, loaded_data_dict):
         """
         Apply image transformations to the loaded data.
@@ -388,6 +419,28 @@ class AbstractSentinelImageHandler(ABC):
             row_index, col_index
         )
         return row_index, col_index
+
+    def get_longitude_latitude_from_row_col_index(self, row_index, col_index):
+        (
+            row_index,
+            col_index,
+        ) = self._image_wkt_polygone_subset().apply_inverse_transformation_to_geocoordinate(
+            row_index, col_index
+        )
+        for transformation in self._image_transformation_list():
+            (
+                row_index,
+                col_index,
+            ) = transformation.apply_inverse_transformation_to_geocoordinate(
+                row_index, col_index
+            )
+        projected_longitude, projected_latitute = self.inverse_index_function(
+            row_index, col_index
+        )
+        longitude, latitude = project_epsg_32620_to_epsg4326(
+            projected_longitude, projected_latitute
+        )
+        return longitude, latitude
 
     def get_rgb_float_true_color_image(self, beta=3000):
         """

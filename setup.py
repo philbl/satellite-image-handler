@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="satellite-image-handler",
-    version="0.1.1",
+    version="0.2.1",
     description="Package to handle satellite image",
     url="https://github.com/philbl/satellite-image-handler",
     author="Philippe Blouin-Leclerc",
@@ -13,5 +13,5 @@ setup(
         "pandas==2.1.0",
         "rasterio==1.3.6",
         "scikit-image==0.20.0",
-    ]
+    ],
 )

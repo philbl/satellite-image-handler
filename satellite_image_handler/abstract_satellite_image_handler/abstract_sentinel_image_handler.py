@@ -12,6 +12,7 @@ from satellite_image_handler.utils.projections import (
     project_epsg4326_to_epsg_32620,
     project_epsg_32620_to_epsg4326,
 )
+from satellite_image_handler.utils.bridge_points_handler import BridgePointsHandler
 
 
 class AbstractSentinelImageHandler(ABC):
@@ -62,14 +63,16 @@ class AbstractSentinelImageHandler(ABC):
         "scene_clf": "SCL_20m",
     }
 
-    def __init__(self, zip_path):
+    def __init__(self, zip_path, bridge_points_handler=None):
         """
         Initialize the AbstractImageHandler object.
 
         Args:
             zip_path (str): Path to the zip file containing the image data.
+            bridge_points_handler (BridgePointsHandler): Bridge points handler class or None
         """
         self.zip_path = zip_path
+        self.bridge_points_handler = bridge_points_handler
         loaded_data_dict = self._get_data_from_zip_file(self.zip_path)
         self._image_shape = loaded_data_dict["blue_band"].shape  # TODO Clean that
         self._date = loaded_data_dict["date"]
@@ -240,6 +243,12 @@ class AbstractSentinelImageHandler(ABC):
             tuple: Shape of the image.
         """
         return self._image_shape
+
+    def get_mask_from_bridge_points_handler(self):
+        if isinstance(self.bridge_points_handler, BridgePointsHandler):
+            return self.bridge_points_handler.get_valid_points_mask(self.image_shape)
+        else:
+            return None
 
     def get_smoothed_water_mask(self, sigma=2, threshold=0.75):
         return (

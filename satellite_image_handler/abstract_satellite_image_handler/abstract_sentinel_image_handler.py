@@ -74,6 +74,9 @@ class AbstractSentinelImageHandler(ABC):
         self.zip_path = zip_path
         self.bridge_points_handler = bridge_points_handler
         loaded_data_dict = self._get_data_from_zip_file(self.zip_path)
+        self._before_transform_image_shape = loaded_data_dict[
+            "blue_band"
+        ].shape  # TODO Clean that
         self._date = loaded_data_dict["date"]
         self._cloud_coverage = loaded_data_dict["cloud_coverage"]
         self._crs = loaded_data_dict["crs"]
@@ -232,6 +235,16 @@ class AbstractSentinelImageHandler(ABC):
             numpy.ndarray: Affine transformation matrix of the image.
         """
         return self._affine_matrix
+
+    @property
+    def before_transform_image_shape(self):
+        """
+        Shape of the image before transformation.
+
+        Returns:
+            tuple: Shape of the image.
+        """
+        return self._before_transform_image_shape
 
     @property
     def image_shape(self):

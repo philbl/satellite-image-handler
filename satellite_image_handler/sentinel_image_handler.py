@@ -29,7 +29,7 @@ class BouctoucheSentinelImageHandler(AbstractSentinelImageHandler):
         return "bouctouche"
 
     def _image_transformation_list(self):
-        transform_list = [RotateImage(-45, self.image_shape)]
+        transform_list = [RotateImage(-45, self.before_transform_image_shape)]
         return transform_list
 
     def _image_wkt_polygone_subset(self):
@@ -77,7 +77,7 @@ class MorellSentinelImageHandler(AbstractSentinelImageHandler):
         return "morell"
 
     def _image_transformation_list(self):
-        transform_list = [RotateImage(-90, self.image_shape)]
+        transform_list = [RotateImage(-90, self.before_transform_image_shape)]
         return transform_list
 
     def _image_wkt_polygone_subset(self):

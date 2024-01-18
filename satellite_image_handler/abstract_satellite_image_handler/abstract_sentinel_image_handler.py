@@ -74,7 +74,6 @@ class AbstractSentinelImageHandler(ABC):
         self.zip_path = zip_path
         self.bridge_points_handler = bridge_points_handler
         loaded_data_dict = self._get_data_from_zip_file(self.zip_path)
-        self._image_shape = loaded_data_dict["blue_band"].shape  # TODO Clean that
         self._date = loaded_data_dict["date"]
         self._cloud_coverage = loaded_data_dict["cloud_coverage"]
         self._crs = loaded_data_dict["crs"]
@@ -242,7 +241,7 @@ class AbstractSentinelImageHandler(ABC):
         Returns:
             tuple: Shape of the image.
         """
-        return self._image_shape
+        return self.blue_band.shape  # TODO Clean that
 
     def get_mask_from_bridge_points_handler(self):
         if isinstance(self.bridge_points_handler, BridgePointsHandler):

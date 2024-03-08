@@ -11,6 +11,7 @@ class AbstractAcoliteImageHandler(ABC):
         "green_band": ["rhos_559", "rhos_560"],
         "red_band": ["rhos_665"],
         "nir_band": ["rhos_833"],
+        "swir_band": ["rhos_1610", "rhos_1614"],
         "lon": ["lon"],
         "lat": ["lat"],
     }
@@ -82,6 +83,16 @@ class AbstractAcoliteImageHandler(ABC):
             numpy.ndarray: NIR band data.
         """
         return self._subset_transformed_data_dict["nir_band"]
+
+    @property
+    def swir_band(self):
+        """
+        SWIR band data.
+
+        Returns:
+            numpy.ndarray: SWIR band data.
+        """
+        return self._subset_transformed_data_dict["swir_band"]
 
     @property
     def true_color_image(self):

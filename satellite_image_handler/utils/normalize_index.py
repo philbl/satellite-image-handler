@@ -23,6 +23,31 @@ def create_ndwi_raster(green_band, nir_band):
     return ndwi
 
 
+def create_water_index_raster(image_handler):
+    """
+    Calculates the Normalized Difference Water Index (NDWI) raster from the input green and near-infrared (NIR) bands.
+
+    Args:
+        green_band (numpy.ndarray): Array representing the green band.
+        nir_band (numpy.ndarray): Array representing the near-infrared (NIR) band.
+
+    Returns:
+        numpy.ndarray: Array representing the NDWI raster.
+
+    Raises:
+        ValueError: If the input bands have different shapes.
+
+    Notes:
+        - The input bands are expected to be in the same spatial extent and coordinate system.
+        - The input bands should be provided as numpy arrays.
+        - The NDWI is calculated using the formula: (green_band - nir_band) / (green_band + nir_band).
+    """
+    if image_handler.atmoshperic_correction == "Sen2Cor":
+        return create_ndwi_raster(image_handler.green_band, image_handler.nir_band)
+    elif image_handler.atmoshperic_correction == "Acolite":
+        return image_handler.swir_band
+
+
 def create_ndti_raster(red_band, green_band):
     """
     Calculates the Normalized Difference Turbidity Index (NDTI) raster from the input red and green bands.

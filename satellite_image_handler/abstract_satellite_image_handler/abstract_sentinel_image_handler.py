@@ -87,6 +87,16 @@ class AbstractSentinelImageHandler(ABC):
         )
 
     @property
+    def atmoshperic_correction(self):
+        """
+        Name of the Atmoshperic Correction.
+
+        Returns:
+            str: Atmoshperic Correction
+        """
+        return "Sen2Cor"
+
+    @property
     @abstractmethod
     def estuary_name(self):
         """

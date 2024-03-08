@@ -35,6 +35,15 @@ class AbstractAcoliteImageHandler(ABC):
         ] = self._get_true_color_image()
 
     @property
+    def atmoshperic_correction(self):
+        """
+        Name of the Atmoshperic Correction.
+        Returns:
+            str: Atmoshperic Correction
+        """
+        return "Acolite"
+
+    @property
     @abstractmethod
     def estuary_name(self):
         """

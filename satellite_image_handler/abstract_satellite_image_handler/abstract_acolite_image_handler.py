@@ -30,6 +30,8 @@ class AbstractAcoliteImageHandler(ABC):
         self._subset_transformed_data_dict = self._apply_image_wkt_polygone_subset(
             transformed_data_dict
         )
+        del self._transformed_lon
+        del self._transformed_lat
         self._subset_transformed_data_dict[
             "true_color_image"
         ] = self._get_true_color_image()

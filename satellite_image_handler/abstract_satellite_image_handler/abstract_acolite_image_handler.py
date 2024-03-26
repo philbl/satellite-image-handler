@@ -3,6 +3,7 @@ from netCDF4 import Dataset
 import numpy
 
 from satellite_image_handler.utils.bridge_points_handler import BridgePointsHandler
+from satellite_image_handler.utils.clean_water_mask_handler import CleanWaterMaskHandler
 
 
 class AbstractAcoliteImageHandler(ABC):
@@ -16,9 +17,10 @@ class AbstractAcoliteImageHandler(ABC):
         "lat": ["lat"],
     }
 
-    def __init__(self, path, bridge_points_handler=None):
+    def __init__(self, path, bridge_points_handler=None, clean_water_mask_handler=None):
         self.path = path
         self.bridge_points_handler = bridge_points_handler
+        self.clean_water_mask_handler = clean_water_mask_handler
         loaded_data_dict = self._load_nc_data_dict(self.path)
         self._before_transform_image_shape = loaded_data_dict[
             "blue_band"
@@ -168,6 +170,25 @@ class AbstractAcoliteImageHandler(ABC):
     def get_mask_from_bridge_points_handler(self):
         if isinstance(self.bridge_points_handler, BridgePointsHandler):
             return self.bridge_points_handler.get_valid_points_mask(self.image_shape)
+        else:
+            return None
+
+    def get_mask_from_clean_water_mask_handler(self):
+        if isinstance(self.clean_water_mask_handler, CleanWaterMaskHandler):
+            return self.clean_water_mask_handler.get_valid_points_mask()
+        else:
+            return None
+
+    def get_water_mask_from_bridge_and_clean_water_mask_handler(self):
+        water_mask = []
+        if isinstance(self.bridge_points_handler, BridgePointsHandler) and isinstance(
+            self.clean_water_mask_handler, CleanWaterMaskHandler
+        ):
+            water_mask.append(
+                self.bridge_points_handler.get_valid_points_mask(self.image_shape)
+            )
+            water_mask.append(~self.clean_water_mask_handler.get_valid_points_mask())
+            return numpy.all(water_mask, axis=0)
         else:
             return None
 

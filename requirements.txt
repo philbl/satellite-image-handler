@@ -1,5 +1,5 @@
 black==23.3.0
-flake8==6.0.0
+flake8==7.0.0
 geopandas==0.12.2
 netCDF4==1.6.5
 numpy==1.26.0

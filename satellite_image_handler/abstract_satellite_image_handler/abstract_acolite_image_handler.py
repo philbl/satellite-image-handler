@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from netCDF4 import Dataset
 import numpy
+from skimage.util import img_as_ubyte
 
 from satellite_image_handler.utils.bridge_points_handler import BridgePointsHandler
 from satellite_image_handler.utils.clean_water_mask_handler import CleanWaterMaskHandler
@@ -12,7 +13,7 @@ class AbstractAcoliteImageHandler(ABC):
         "green_band": ["rhos_559", "rhos_560"],
         "red_band": ["rhos_665"],
         "nir_band": ["rhos_833"],
-        "swir_band": ["rhos_1610", "rhos_1614"],
+        # "swir_band": ["rhos_1610", "rhos_1614"],
         "lon": ["lon"],
         "lat": ["lat"],
     }
@@ -37,6 +38,9 @@ class AbstractAcoliteImageHandler(ABC):
         self._subset_transformed_data_dict[
             "true_color_image"
         ] = self._get_true_color_image()
+        self._subset_transformed_data_dict.pop("blue_band")
+        self._subset_transformed_data_dict.pop("green_band")
+        self._subset_transformed_data_dict.pop("red_band")
 
     @property
     def atmoshperic_correction(self):
@@ -97,15 +101,15 @@ class AbstractAcoliteImageHandler(ABC):
         """
         return self._subset_transformed_data_dict["nir_band"]
 
-    @property
-    def swir_band(self):
-        """
-        SWIR band data.
+    # @property
+    # def swir_band(self):
+    #     """
+    #     SWIR band data.
 
-        Returns:
-            numpy.ndarray: SWIR band data.
-        """
-        return self._subset_transformed_data_dict["swir_band"]
+    #     Returns:
+    #         numpy.ndarray: SWIR band data.
+    #     """
+    #     return self._subset_transformed_data_dict["swir_band"]
 
     @property
     def true_color_image(self):
@@ -165,7 +169,7 @@ class AbstractAcoliteImageHandler(ABC):
         Returns:
             tuple: Shape of the image.
         """
-        return self.blue_band.shape  # TODO Clean that
+        return self.nir_band.shape  # TODO Clean that
 
     def get_mask_from_bridge_points_handler(self):
         if isinstance(self.bridge_points_handler, BridgePointsHandler):
@@ -199,7 +203,8 @@ class AbstractAcoliteImageHandler(ABC):
         r_tmp = numpy.interp(self.red_band, bsc, [0, 1])
         g_tmp = numpy.interp(self.green_band, bsc, [0, 1])
         b_tmp = numpy.interp(self.blue_band, bsc, [0, 1])
-        return numpy.concatenate([[r_tmp], [g_tmp], [b_tmp]]).transpose(1, 2, 0)
+        tci = numpy.concatenate([[r_tmp], [g_tmp], [b_tmp]]).transpose(1, 2, 0)
+        return img_as_ubyte(tci)
 
     @abstractmethod
     def _image_transformation_list(self):

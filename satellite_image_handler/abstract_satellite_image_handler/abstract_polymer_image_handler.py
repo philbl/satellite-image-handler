@@ -7,16 +7,16 @@ from satellite_image_handler.utils.bridge_points_handler import BridgePointsHand
 from satellite_image_handler.utils.clean_water_mask_handler import CleanWaterMaskHandler
 
 
-class AbstractAcoliteImageHandler(ABC):
+class AbstractPolymerImageHandler(ABC):
     BAND_NAME_MAPPING = {
-        "blue_band": ["rhos_492"],
-        "green_band": ["rhos_559", "rhos_560"],
-        "red_band": ["rhos_665"],
-        "nir_band": ["rhos_833"],
-        "swir_band": ["rhos_1610", "rhos_1614"],
+        "blue_band": ["Rw490"],
+        "green_band": ["Rw560"],
+        "red_band": ["Rw665"],
+        "nir_band": ["Rw842"],
+        "swir_band": ["Rnir"],
         # "swir2_band": ["rhos_2186", "rhos_2202"],
-        "lon": ["lon"],
-        "lat": ["lat"],
+        "lon": ["longitude"],
+        "lat": ["latitude"],
     }
 
     def __init__(self, path, bridge_points_handler=None, clean_water_mask_handler=None):
@@ -40,8 +40,8 @@ class AbstractAcoliteImageHandler(ABC):
             "true_color_image"
         ] = self._get_true_color_image()
         # self._subset_transformed_data_dict.pop("blue_band")
-        self._subset_transformed_data_dict.pop("green_band")
-        self._subset_transformed_data_dict.pop("red_band")
+        # self._subset_transformed_data_dict.pop("green_band")
+        # self._subset_transformed_data_dict.pop("red_band")
 
     @property
     def atmoshperic_correction(self):
@@ -50,7 +50,7 @@ class AbstractAcoliteImageHandler(ABC):
         Returns:
             str: Atmoshperic Correction
         """
-        return "Acolite"
+        return "Polymer"
 
     @property
     @abstractmethod
@@ -160,7 +160,7 @@ class AbstractAcoliteImageHandler(ABC):
         Returns:
             str: Date of the image.
         """
-        return self._date
+        return self._date.replace(" ", "T")
 
     @property
     def before_transform_image_shape(self):
@@ -323,7 +323,7 @@ class AbstractAcoliteImageHandler(ABC):
 
     def _load_nc_data_dict(self, path):
         nc_data = Dataset(path)
-        data_dict = {"date": nc_data.isodate}
+        data_dict = {"date": nc_data.sensing_time}
         for band_name, band_code_list in self.BAND_NAME_MAPPING.items():
             data_dict[band_name] = self.get_items_with_list_fallback(
                 nc_data.variables, band_code_list

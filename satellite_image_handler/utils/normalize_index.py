@@ -46,7 +46,10 @@ def create_water_index_raster(image_handler):
         return create_ndwi_raster(image_handler.green_band, image_handler.nir_band)
     elif image_handler.atmoshperic_correction == "Acolite":
         return image_handler.nir_band * -1.0
-    # return image_handler.swir_band * -1.0
+        # return image_handler.swir_band * -1.0
+    elif image_handler.atmoshperic_correction == "Polymer":
+        # return image_handler.nir_band * -1.0
+        return image_handler.swir_band * -1.0
 
 
 def create_ndti_raster(red_band, green_band):

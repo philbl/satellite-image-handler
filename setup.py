@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="satellite-image-handler",
-    version="0.4.2",
+    version="0.5.0",
     description="Package to handle satellite image",
     url="https://github.com/philbl/satellite-image-handler",
     author="Philippe Blouin-Leclerc",
